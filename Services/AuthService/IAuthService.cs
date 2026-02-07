@@ -1,4 +1,4 @@
-﻿using HR_ADMIN_PORTAL.dto;
+﻿using HR_ADMIN_PORTAL.dto.AuthDtos;
 
 namespace HR_ADMIN_PORTAL.Services.AuthService
 {

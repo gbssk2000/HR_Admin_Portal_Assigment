@@ -1,6 +1,8 @@
 using HR_ADMIN_PORTAL.Data;
+using HR_ADMIN_PORTAL.Repositories.Employees;
 using HR_ADMIN_PORTAL.Repositories.Users;
 using HR_ADMIN_PORTAL.Services.AuthService;
+using HR_ADMIN_PORTAL.Services.EmployeeService;
 using HR_ADMIN_PORTAL.Services.JwtTokenService;
 using HR_ADMIN_PORTAL.Services.JwtTokenService.JwtTokenServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,6 +23,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

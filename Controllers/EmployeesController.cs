@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using HR_ADMIN_PORTAL.dto.EmployeeDtos;
+using HR_ADMIN_PORTAL.Models;
+using HR_ADMIN_PORTAL.Services.EmployeeService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HR_ADMIN_PORTAL.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/employees")]
     [Authorize]
     public class EmployeesController : Controller
     {
@@ -14,79 +17,48 @@ namespace HR_ADMIN_PORTAL.Controllers
         {
             return Ok("This is protected data");
         }
-        // GET: EmployeesController
-        public ActionResult Index()
+        private readonly IEmployeeService _employeeService;
+
+        public EmployeesController(IEmployeeService employeeService)
         {
-            return View();
+            _employeeService = employeeService;
         }
 
-        // GET: EmployeesController/Details/5
-        public ActionResult Details(int id)
+        [HttpGet]
+        public IActionResult GetAll()
         {
-            return View();
+            return Ok(_employeeService.GetAll());
         }
 
-        // GET: EmployeesController/Create
-        public ActionResult Create()
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
         {
-            return View();
+            var employee = _employeeService.GetById(id);
+            if (employee == null)
+                return NotFound("Employee not found");
+
+            return Ok(employee);
         }
 
-        // POST: EmployeesController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public IActionResult Add(EmployeeCreateAndUpdateDto dto)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            _employeeService.Add(dto);
+            return Ok("Employee created successfully");
         }
 
-        // GET: EmployeesController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, EmployeeCreateAndUpdateDto dto)
         {
-            return View();
+            _employeeService.Update(id, dto);
+            return Ok("Employee updated successfully");
         }
 
-        // POST: EmployeesController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: EmployeesController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: EmployeesController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            _employeeService.Delete(id);
+            return Ok("Employee deleted successfully");
         }
     }
 }

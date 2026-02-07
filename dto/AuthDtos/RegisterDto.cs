@@ -1,4 +1,4 @@
-﻿namespace HR_ADMIN_PORTAL.dto
+﻿namespace HR_ADMIN_PORTAL.dto.AuthDtos
 {
     public class RegisterDto
     {

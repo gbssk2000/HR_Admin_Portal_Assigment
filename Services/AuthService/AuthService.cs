@@ -1,9 +1,9 @@
-﻿using HR_ADMIN_PORTAL.dto;
-using HR_ADMIN_PORTAL.Models;
+﻿using HR_ADMIN_PORTAL.Models;
 using HR_ADMIN_PORTAL.Repositories.Users;
 using HR_ADMIN_PORTAL.Services.JwtTokenService.JwtTokenServices;
 using HR_ADMIN_PORTAL.Repositories;
 using HR_ADMIN_PORTAL.helper;
+using HR_ADMIN_PORTAL.dto.AuthDtos;
 
 namespace HR_ADMIN_PORTAL.Services.AuthService
 {

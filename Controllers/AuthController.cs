@@ -1,4 +1,4 @@
-﻿using HR_ADMIN_PORTAL.dto;
+﻿using HR_ADMIN_PORTAL.dto.AuthDtos;
 using HR_ADMIN_PORTAL.Services.AuthService;
 using Microsoft.AspNetCore.Mvc;
 
