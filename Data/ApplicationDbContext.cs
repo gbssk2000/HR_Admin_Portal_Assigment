@@ -11,5 +11,6 @@ namespace HR_ADMIN_PORTAL.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<Attendance> Attendance { get; set; }
     }
 }

@@ -1,82 +1,71 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using HR_ADMIN_PORTAL.Services.AttendanceService;
+using HR_ADMIN_PORTAL.dto.AttendanceDto;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HR_ADMIN_PORTAL.Controllers
 {
-    public class AttendanceController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class AttendanceController : ControllerBase
     {
-        // GET: AttendanceController
-        public ActionResult Index()
+        private readonly IAttendanceService _attendanceService;
+
+        public AttendanceController(IAttendanceService attendanceService)
         {
-            return View();
+            _attendanceService = attendanceService;
         }
 
-        // GET: AttendanceController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: AttendanceController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: AttendanceController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        // GET: api/Attendance
+        [HttpGet]
+        public ActionResult<IEnumerable<AttendanceResponseDto>> GetAll()
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var attendance = _attendanceService.GetAll();
+                return Ok(attendance);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { message = "An error occurred while fetching attendance records", error = ex.Message });
             }
         }
 
-        // GET: AttendanceController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: AttendanceController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        // GET: api/Attendance/5
+        [HttpGet("{id}")]
+        public ActionResult<AttendanceResponseDto> GetById(int id)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var attendance = _attendanceService.GetById(id);
+                if (attendance == null)
+                    return NotFound(new { message = "Attendance record not found" });
+
+                return Ok(attendance);
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { message = "An error occurred while fetching attendance record", error = ex.Message });
             }
         }
 
-        // GET: AttendanceController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: AttendanceController/Delete/5
+        // POST: api/Attendance
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Create([FromBody] AttendanceCreateDto dto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                _attendanceService.Add(dto);
+                return Ok(new { message = "Attendance record created successfully" });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { message = "An error occurred while creating attendance record", error = ex.Message });
             }
         }
     }

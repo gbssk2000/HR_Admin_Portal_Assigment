@@ -1,82 +1,170 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using HR_ADMIN_PORTAL.Services.ReportService;
 
 namespace HR_ADMIN_PORTAL.Controllers
 {
-    public class ReportsController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize]
+    public class ReportsController : ControllerBase
     {
-        // GET: ReportsController
-        public ActionResult Index()
+        private readonly IReportService _reportService;
+
+        public ReportsController(IReportService reportService)
         {
-            return View();
+            _reportService = reportService;
         }
 
-        // GET: ReportsController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: ReportsController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ReportsController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        // Employee Directory Reports
+        [HttpGet("employee-directory/pdf")]
+        public IActionResult GetEmployeeDirectoryPdf()
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var pdf = _reportService.GenerateEmployeeDirectoryPdf();
+                return File(pdf, "application/pdf", $"employee-directory-{DateTime.Now:yyyyMMdd}.pdf");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { message = "Error generating PDF report", error = ex.Message });
             }
         }
 
-        // GET: ReportsController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: ReportsController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        [HttpGet("employee-directory/excel")]
+        public IActionResult GetEmployeeDirectoryExcel()
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                var excel = _reportService.GenerateEmployeeDirectoryExcel();
+                return File(excel, 
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"employee-directory-{DateTime.Now:yyyyMMdd}.xlsx");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { message = "Error generating Excel report", error = ex.Message });
             }
         }
 
-        // GET: ReportsController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: ReportsController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        // Attendance Reports
+        [HttpGet("attendance/pdf")]
+        public IActionResult GetAttendanceReportPdf(
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (startDate > endDate)
+                    return BadRequest(new { message = "Start date must be before end date" });
+
+                var pdf = _reportService.GenerateAttendanceReportPdf(startDate, endDate);
+                return File(pdf, "application/pdf", 
+                    $"attendance-report-{startDate:yyyyMMdd}-to-{endDate:yyyyMMdd}.pdf");
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                return StatusCode(500, new { message = "Error generating PDF report", error = ex.Message });
+            }
+        }
+
+        [HttpGet("attendance/excel")]
+        public IActionResult GetAttendanceReportExcel(
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate)
+        {
+            try
+            {
+                if (startDate > endDate)
+                    return BadRequest(new { message = "Start date must be before end date" });
+
+                var excel = _reportService.GenerateAttendanceReportExcel(startDate, endDate);
+                return File(excel,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"attendance-report-{startDate:yyyyMMdd}-to-{endDate:yyyyMMdd}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating Excel report", error = ex.Message });
+            }
+        }
+
+        // Department Reports
+        [HttpGet("departments/pdf")]
+        public IActionResult GetDepartmentReportPdf()
+        {
+            try
+            {
+                var pdf = _reportService.GenerateDepartmentReportPdf();
+                return File(pdf, "application/pdf", $"department-report-{DateTime.Now:yyyyMMdd}.pdf");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating PDF report", error = ex.Message });
+            }
+        }
+
+        [HttpGet("departments/excel")]
+        public IActionResult GetDepartmentReportExcel()
+        {
+            try
+            {
+                var excel = _reportService.GenerateDepartmentReportExcel();
+                return File(excel,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"department-report-{DateTime.Now:yyyyMMdd}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating Excel report", error = ex.Message });
+            }
+        }
+
+        // Salary Reports
+        [HttpGet("salary/pdf")]
+        public IActionResult GetSalaryReportPdf(
+            [FromQuery] int month,
+            [FromQuery] int year)
+        {
+            try
+            {
+                if (month < 1 || month > 12)
+                    return BadRequest(new { message = "Month must be between 1 and 12" });
+
+                if (year < 2000 || year > DateTime.Now.Year)
+                    return BadRequest(new { message = "Invalid year" });
+
+                var pdf = _reportService.GenerateSalaryReportPdf(month, year);
+                return File(pdf, "application/pdf", 
+                    $"salary-report-{year}-{month:D2}.pdf");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating PDF report", error = ex.Message });
+            }
+        }
+
+        [HttpGet("salary/excel")]
+        public IActionResult GetSalaryReportExcel(
+            [FromQuery] int month,
+            [FromQuery] int year)
+        {
+            try
+            {
+                if (month < 1 || month > 12)
+                    return BadRequest(new { message = "Month must be between 1 and 12" });
+
+                if (year < 2000 || year > DateTime.Now.Year)
+                    return BadRequest(new { message = "Invalid year" });
+
+                var excel = _reportService.GenerateSalaryReportExcel(month, year);
+                return File(excel,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"salary-report-{year}-{month:D2}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Error generating Excel report", error = ex.Message });
             }
         }
     }
